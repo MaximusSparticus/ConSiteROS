@@ -1,0 +1,3 @@
+[submodule "src/bimini"]
+	path = src/bimini
+	url = https://github.com/MaximusSparticus/bimini.git
