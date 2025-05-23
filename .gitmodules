@@ -4,3 +4,6 @@
 [submodule "src/bimini_msgs"]
 	path = src/bimini_msgs
 	url = https://github.com/MaximusSparticus/bimini_msgs.git
+[submodule "src/bimbot"]
+	path = src/bimbot
+	url = https://github.com/MaximusSparticus/bimbot.git

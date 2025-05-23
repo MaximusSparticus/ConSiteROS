@@ -6,7 +6,7 @@
         {
             "label": "build-rel",
             "type": "shell",
-            "command": "colcon build",
+            "command": "clear && colcon build",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -15,7 +15,16 @@
         {
             "label": "build-dbg",
             "type": "shell",
-            "command": "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug",
+            "command": "clear && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build"
+        },
+        {
+            "label": "launch sim",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/install/setup.bash && ros2 launch bimbot spawn_robots.launch.py",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
