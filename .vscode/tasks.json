@@ -17,7 +17,10 @@
             "type": "shell",
             "command": "clear && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug",
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "PYTHONPATH": "/opt/ros/jazzy/lib/pytho3.12/site-packages",
+                },
             },
             "group": "build"
         },
@@ -25,6 +28,23 @@
             "label": "launch sim",
             "type": "shell",
             "command": "source ${workspaceFolder}/install/setup.bash && ros2 launch bimbot spawn_robots.launch.py",
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "AMENT_PREFIX_PATH": "${workspaceFolder}/install:${env:AMENT_PREFIX_PATH}",
+                    "CMAKE_PREFIX_PATH": "${workspaceFolder}/install:${env:CMAKE_PREFIX_PATH}",
+                    "LD_LIBRARY_PATH": "${workspaceFolder}/install/bimini/lib:${workspaceFolder}/install/bimini_msgs/lib:${env:LD_LIBRARY_PATH}",
+                    "PATH": "${workspaceFolder}/install/bin:${env:PATH}",
+                    "PYTHONPATH": "${workspaceFolder}/install/lib/python3.8/site-packages:${env:PYTHONPATH}",
+                    "ROS_PACKAGE_PATH": "${workspaceFolder}/install/share:${env:ROS_PACKAGE_PATH}"
+                },
+            },
+            "group": "build"
+        },
+        {
+            "label": "launch sim (bkp)",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/install/setup.bash && ros2 launch bimbot spawn_robots.launch.py world:=${input:world_file}",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -57,5 +77,15 @@
             },
             "group": "build"
         },
+    ],
+    "inputs": [
+        {
+            "id": "world_file",
+            "type": "pickString",
+            "description": "Select a Gazebo world file",
+            "options": [
+                "${workspaceFolder}/install/bimini/share/bimini/worlds/generated_worlds/construction_site_from_ifc.sdf"
+            ],
+        }
     ]
 }
