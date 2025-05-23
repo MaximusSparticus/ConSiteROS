@@ -1,6 +1,4 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
         {
@@ -8,7 +6,15 @@
             "type": "shell",
             "command": "clear && colcon build",
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "AMENT_PREFIX_PATH": "${workspaceFolder}/install:${env:AMENT_PREFIX_PATH}",
+                    "CMAKE_PREFIX_PATH": "${workspaceFolder}/install:${env:CMAKE_PREFIX_PATH}",
+                    "LD_LIBRARY_PATH": "${workspaceFolder}/install/bimini/lib:${workspaceFolder}/install/bimini_msgs/lib:${env:LD_LIBRARY_PATH}",
+                    "PATH": "${workspaceFolder}/install/bin:${env:PATH}",
+                    "PYTHONPATH": "${workspaceFolder}/install/lib/python3.12/site-packages:${env:PYTHONPATH}",
+                    "ROS_PACKAGE_PATH": "${workspaceFolder}/install/share:${env:ROS_PACKAGE_PATH}"
+                }
             },
             "group": "build"
         },
@@ -19,13 +25,45 @@
             "options": {
                 "cwd": "${workspaceFolder}",
                 "env": {
-                    "PYTHONPATH": "/opt/ros/jazzy/lib/pytho3.12/site-packages",
-                },
+                    "PYTHONPATH": "/opt/ros/jazzy/lib/python3.12/site-packages:${env:PYTHONPATH}",
+                    "AMENT_PREFIX_PATH": "${workspaceFolder}/install:${env:AMENT_PREFIX_PATH}",
+                    "CMAKE_PREFIX_PATH": "${workspaceFolder}/install:${env:CMAKE_PREFIX_PATH}",
+                    "LD_LIBRARY_PATH": "${workspaceFolder}/install/bimini/lib:${workspaceFolder}/install/bimini_msgs/lib:${env:LD_LIBRARY_PATH}",
+                    "PATH": "${workspaceFolder}/install/bin:${env:PATH}",
+                    "ROS_PACKAGE_PATH": "${workspaceFolder}/install/share:${env:ROS_PACKAGE_PATH}"
+                }
             },
             "group": "build"
         },
         {
-            "label": "launch sim",
+            "label": "build-ordered",
+            "type": "shell",
+            "command": "clear && colcon build --packages-select bimini_msgs && colcon build --packages-select bimini && colcon build --packages-select bimbot",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build"
+        },
+        {
+            "label": "clean-build",
+            "type": "shell",
+            "command": "rm -rf build/ install/ log/",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build"
+        },
+        {
+            "label": "generate-ifc",
+            "type": "shell",
+            "command": "source install/setup.bash && python3 scripts/ifc_construction_site_generator.py",
+            "options": {
+                "cwd": "${workspaceFolder}/src/bimini"
+            },
+            "group": "build"
+        },
+        {
+            "label": "launch-sim",
             "type": "shell",
             "command": "source ${workspaceFolder}/install/setup.bash && ros2 launch bimbot spawn_robots.launch.py",
             "options": {
@@ -35,18 +73,10 @@
                     "CMAKE_PREFIX_PATH": "${workspaceFolder}/install:${env:CMAKE_PREFIX_PATH}",
                     "LD_LIBRARY_PATH": "${workspaceFolder}/install/bimini/lib:${workspaceFolder}/install/bimini_msgs/lib:${env:LD_LIBRARY_PATH}",
                     "PATH": "${workspaceFolder}/install/bin:${env:PATH}",
-                    "PYTHONPATH": "${workspaceFolder}/install/lib/python3.8/site-packages:${env:PYTHONPATH}",
-                    "ROS_PACKAGE_PATH": "${workspaceFolder}/install/share:${env:ROS_PACKAGE_PATH}"
-                },
-            },
-            "group": "build"
-        },
-        {
-            "label": "launch sim (bkp)",
-            "type": "shell",
-            "command": "source ${workspaceFolder}/install/setup.bash && ros2 launch bimbot spawn_robots.launch.py world:=${input:world_file}",
-            "options": {
-                "cwd": "${workspaceFolder}"
+                    "PYTHONPATH": "${workspaceFolder}/install/lib/python3.12/site-packages:${env:PYTHONPATH}",
+                    "ROS_PACKAGE_PATH": "${workspaceFolder}/install/share:${env:ROS_PACKAGE_PATH}",
+                    "GZ_SIM_RESOURCE_PATH": "${workspaceFolder}/install/bimbot/share/bimbot/models:${env:GZ_SIM_RESOURCE_PATH}"
+                }
             },
             "group": "build"
         },
@@ -60,23 +90,14 @@
             "group": "build"
         },
         {
-            "label": "bimini_client",
+            "label": "bimini_client",  
             "type": "shell",
             "command": "source ${workspaceFolder}/install/setup.bash && ros2 run bimini bimini_client",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
             "group": "build"
-        },
-        {
-            "label": "clear build",
-            "type": "shell",
-            "command": "rm -rf build/ install/",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": "build"
-        },
+        }
     ],
     "inputs": [
         {
@@ -85,7 +106,7 @@
             "description": "Select a Gazebo world file",
             "options": [
                 "${workspaceFolder}/install/bimini/share/bimini/worlds/generated_worlds/construction_site_from_ifc.sdf"
-            ],
+            ]
         }
     ]
 }
